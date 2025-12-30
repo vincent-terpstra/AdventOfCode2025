@@ -105,3 +105,6 @@ C:\Users\vdter\RiderProjects\AOC_2025\AOC_2025\bin\Debug\net8.0\Day_3\Data\demo.
 C:\Users\vdter\RiderProjects\AOC_2025\AOC_2025\bin\Debug\net8.0\Day_3\Data\puzzle.txt
 C:\Users\vdter\RiderProjects\AOC_2025\AOC_2025\bin\Debug\net8.0\Day_4\Data\demo.txt
 C:\Users\vdter\RiderProjects\AOC_2025\AOC_2025\bin\Debug\net8.0\Day_4\Data\puzzle.txt
+C:\Users\vdter\RiderProjects\AOC_2025\AOC_2025\bin\Debug\net8.0\Day_5\Data\demo.txt
+C:\Users\vdter\RiderProjects\AOC_2025\AOC_2025\bin\Debug\net8.0\Day_5\Data\puzzle.txt
+C:\Users\vdter\RiderProjects\AOC_2025\AOC_2025\obj\Debug\net8.0\AOC_2025.sourcelink.json
