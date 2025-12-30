@@ -35,6 +35,38 @@ public class CafeteriaSolution
 
         _testOutputHelper.WriteLine(spoiled);
     }
+    
+    [Fact]
+    public void Demo_Input_FreshRanges(){
+        var text = FileHelper.ReadFileAsList(5, "puzzle.txt");
+        
+        var (receipes, _) = ParseInput(text);
+        
+        var fresh = receipes.Select(r => new Range(r))
+            .OrderBy(r => r.Min)
+            .ToList();
+        
+        ClearOverlappingRanges(fresh);
+        
+        var total = fresh.Sum(r => r.Size());
+        _testOutputHelper.WriteLine(total);
+    }
+
+    private bool ClearOverlappingRanges(List<Range> ranges)
+    {
+        for (int i = 0; i < ranges.Count() - 1; i++)
+        {
+            var range = ranges[i];
+            if (ranges[i + 1].Min <= range.Max)
+            {
+                range.Max = Math.Max(range.Max, ranges[i + 1].Max);
+                ranges.RemoveAt(i + 1);
+                i--;
+            }
+        }
+        
+        return false;
+    }
 
     private bool IsSpoiled(List<Range> ranges, long value)
     {
@@ -88,4 +120,9 @@ public class Range
         Min = long.Parse(parts[0]);
         Max = long.Parse(parts[1]);
     }
+    
+    public long Size() 
+        => Max - Min + 1;
+    
+    public override string ToString() => $"{Min}-{Max}: {Size()}";
 }
