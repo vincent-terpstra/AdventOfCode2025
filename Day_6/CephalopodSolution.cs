@@ -16,6 +16,60 @@ public class CephalopodSolution(ITestOutputHelper testOutputHelper)
         testOutputHelper.WriteLine(result.ToString());
     }
 
+    [Fact]
+    public void Demo_Input_Part2_Should()
+    {
+        var lines = FileHelper.ReadFileAsList(6, "puzzle.txt");
+        
+        int length = lines.First().Count();
+        Assert.All(lines.Skip(1), r => Assert.Equal(length, r.Count()));
+
+        List<string> input = new();
+        for (int i = 0; i < length; i++)
+        {
+            var result = string.Join(string.Empty, lines.Select(l => l[i]));
+            input.Add(result);
+        }
+
+        long total = 0;
+        long subtotal = 0;
+        char Operand = MathOperator.Add;
+        
+        
+        foreach (string value in input)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                total += subtotal;
+                subtotal = 0;
+            } else if (value.EndsWith(MathOperator.Add.ToString()))
+            {
+                Operand = MathOperator.Add;
+                subtotal = long.Parse(value.Substring(0, value.Length - 1));
+            }
+            else if (value.EndsWith(MathOperator.Multiply.ToString()))
+            {
+                Operand = MathOperator.Multiply;
+                subtotal = long.Parse(value.Substring(0, value.Length - 1));
+            }
+            else
+            {
+                long number = long.Parse(value);
+                if (Operand == MathOperator.Add)
+                {
+                    subtotal += number;
+                } else if (Operand == MathOperator.Multiply)
+                {
+                    subtotal *= number;
+                }
+            }
+            
+        }
+        total += subtotal;
+        
+        testOutputHelper.WriteLine(total.ToString());
+    }
+    
     private static List<MathRow> ParseMathRowsFromLines(List<string> lines)
     {
         List<MathRow> rows = new();
