@@ -37,37 +37,43 @@ public class TachyonMap(List<string> input) : Map(input)
         return totalSplits;
     }
 
-    public int ProcessTimeSplits()
-    { int totalSplits = 0;
-        
-        var start = Values.First().IndexOf(TachyonMapLegend.Start);
-        Values.First()[start] = TachyonMapLegend.Beam;
+    public long ProcessTimeSplits()
+    { 
+        var col = Values.First().IndexOf(TachyonMapLegend.Start);
+        int row = 0;
+        return CacheSplits(row, col);
+    }
 
-        for (int i = 0; i < Values.Count - 1; i++)
+    private long CacheSplits(int row, int col, Dictionary<(int, int), long>? counts = null)
+    {
+        counts ??= new();
+        if(counts.TryGetValue((row, col), out var count)) 
+            return count;
+        
+        var total = CountSplits(row, col);
+        counts[(row, col)] = total;
+        return total;
+    }
+    
+    public long CountSplits(int row, int col)
+    {
+        if (row >= Values.Count - 1)
+            return 0;
+        
+        var next = Values[row + 1][col];
+        
+        if (next == TachyonMapLegend.Split)
         {
-            var current = Values[i];
-            var next = Values[(i + 1)];
-
-            for (int j = 0; j < current.Count; j++)
-            {
-                if (current[j] == TachyonMapLegend.Beam)
-                {
-                    var nextValue = next[j];
-                    
-                    if (nextValue == TachyonMapLegend.Empty)
-                    {
-                        next[j] = TachyonMapLegend.Beam;
-                    } 
-                    else if (nextValue == TachyonMapLegend.Split)
-                    {
-                        totalSplits++;
-                        next[j-1] = TachyonMapLegend.Beam;
-                        next[j+1] = TachyonMapLegend.Beam;
-                    }
-                }
-            }
+            var left = CountSplits(row + 1, col - 1);
+            var right = CountSplits(row + 1, col + 1);
+            long total = left + right + 1;
+            return total;
+            
+        } else if (next == TachyonMapLegend.Empty)
+        {
+            return CountSplits(row + 1, col);
         }
-        
-        return totalSplits;
+
+        return 0;
     }
 }
