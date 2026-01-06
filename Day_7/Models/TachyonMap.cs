@@ -37,26 +37,27 @@ public class TachyonMap(List<string> input) : Map(input)
         return totalSplits;
     }
 
-    public long ProcessTimeSplits()
+    public int ProcessTimeSplits(Action<string> log = null)
     { 
         var col = Values.First().IndexOf(TachyonMapLegend.Start);
         int row = 0;
-        return CacheSplits(row, col);
+        Dictionary<(int, int), int > Counts = new();
+        
+        var count =  CountSplits(row, col, Counts);
+        foreach (var key in Counts)
+        {
+            log?.Invoke($"{key.Key.Item1}, {key.Key.Item2}: {key.Value}");
+            
+        }
+
+        return count;
     }
 
-    private long CacheSplits(int row, int col, Dictionary<(int, int), long>? counts = null)
+    public int CountSplits(int row, int col, Dictionary<(int, int), int> counts)
     {
-        counts ??= new();
         if(counts.TryGetValue((row, col), out var count)) 
             return count;
-        
-        var total = CountSplits(row, col);
-        counts[(row, col)] = total;
-        return total;
-    }
-    
-    public long CountSplits(int row, int col)
-    {
+
         if (row >= Values.Count - 1)
             return 0;
         
@@ -64,14 +65,15 @@ public class TachyonMap(List<string> input) : Map(input)
         
         if (next == TachyonMapLegend.Split)
         {
-            var left = CountSplits(row + 1, col - 1);
-            var right = CountSplits(row + 1, col + 1);
-            long total = left + right + 1;
+            var left = CountSplits(row + 1, col - 1, counts);
+            var right = CountSplits(row + 1, col + 1, counts);
+            int total = left + right + 1;
+            counts[(row, col)] = total;
             return total;
             
         } else if (next == TachyonMapLegend.Empty)
         {
-            return CountSplits(row + 1, col);
+            return CountSplits(row + 1, col, counts);
         }
 
         return 0;

@@ -24,7 +24,7 @@ public class TachyonSolution(ITestOutputHelper testOutputHelper)
         var input = FileHelper.ReadFileAsList(7, "demo.txt");
         TachyonMap map = new (input);
 
-        var splits = map.ProcessTimeSplits();
+        var splits = map.ProcessTimeSplits(testOutputHelper.WriteLine);
         
         testOutputHelper.WriteLine(splits.ToString());
     }
