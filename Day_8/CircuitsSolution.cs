@@ -6,20 +6,21 @@ namespace AOC_2025.Day_8;
 public class CircuitsSolution(ITestOutputHelper testOutputHelper)
 {
     
-    private  PriorityQueue<(Junction, Junction), long> CreateQueue(int queueSize) 
-    => new(queueSize + 1
-        //Comparer<long>.Create((x, y) => x.CompareTo(y))
-    );
+    private static Comparer<long> DequeueHighestFirst => 
+        Comparer<long>.Create((x, y) => y.CompareTo(x));
     
     [Fact]
     public void Demo_Circuit_Should()
     {
-        int queueSize = 10;
-        var input = FileHelper.ReadFileAsList(8, "demo.txt");
+        int queueSize = 1000;
+        var input = FileHelper.ReadFileAsList(8, "puzzle.txt");
         
         var junctions = Junction.FromLines(input);
         
-        PriorityQueue<(Junction, Junction), long> queue = CreateQueue(queueSize);
+        PriorityQueue<(Junction, Junction), long> queue = new(
+            queueSize + 1,
+            DequeueHighestFirst
+        );
         
         for(int i = 0; i < junctions.Count; i++)
         {
@@ -61,11 +62,11 @@ public class CircuitsSolution(ITestOutputHelper testOutputHelper)
         junctions.Remove(first);
         junctions.Remove(second);
         
-        var queue = CreateQueue(100);
+        PriorityQueue<(Junction, Junction), long> queue = new(100);
         // keep going until one junction is left
         queue.AddClosest(first, junctions);
         queue.AddClosest(second, junctions);
-        
+
         // find the closest junction to that circuit
         while (junctions.Count > 1)
         {
