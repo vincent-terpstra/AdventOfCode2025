@@ -20,5 +20,7 @@ public class Switch
 
     public bool Contains(Switch other) => this != other && other.Operators.All(Operators.Contains);
     
-    public override string ToString() => Value?.ToString() ?? Id.ToString();
+    public override string ToString() => Id.ToString();
+    
+    public string OperatorString() => string.Join(", ", Operators); 
 }

@@ -51,25 +51,44 @@ public class Factory
             facts = SortFacts(facts);
             addedFact = FindAdditionalFacts(facts, s => { });
             
-            var solve = facts.FirstOrDefault(f => f.Operators.Count == Switches.Count);
-
-            if (solve != null)
-            {
-                return solve.Target;
-            }
+            // var solve = facts.FirstOrDefault(f => f.Operators.Count == Switches.Count);
+            //
+            // if (solve != null)
+            // {
+            //     return solve.Target;
+            // }
             
         } while (addedFact);
 
         testOutputHelper.Invoke(Joltage.ToString());
-        foreach (var f in facts)
+
+        var start = new Status(Joltage.Targets);
+        foreach(var switcher in Switches.Where(s => s.Value != null))
         {
-            testOutputHelper.Invoke(f.ToString());
+            testOutputHelper.Invoke($"{start} - ({switcher.OperatorString()}) - {switcher.Value}");
+            start = start.Next(switcher, switcher.Value ?? 0);
         }
+        testOutputHelper.Invoke($"{start} - {start.Depth}");
+        
+        facts = FilterPartialFacts(facts);
+        facts = PrioritizeFacts(facts);
+        // foreach (var f in facts)
+        // {
+        //     testOutputHelper.Invoke(f.ToString());
+        // }
+        //
+        
         return 0;
     }
     
+    private List<Fact> FilterPartialFacts(List<Fact> facts)
+        => facts.Where(f => f.Operators.All(opr => opr.Value == null)).ToList();
+    
     private List<Fact> SortFacts(List<Fact> facts)
         => facts.OrderByDescending(f => f.Operators.Count).ToList();
+    
+    private List<Fact> PrioritizeFacts(List<Fact> facts)
+        => facts.OrderBy(f => f.Operators.Count).ThenBy(f => f.Target).ToList();
 
     private bool FindAdditionalFacts(List<Fact> facts, Action<string> testOutputHelper)
     {
@@ -87,10 +106,8 @@ public class Factory
                         
                         var newFact = new Fact(current.Target - next.Target);
                         newFact.Operators.AddRange(current.Operators.Where(opr => !next.Operators.Contains(opr)));
-
-                        if (!CheckContains(facts, newFact))
+                        if(Process(facts, newFact))
                         {
-                            facts.Add(newFact);
                             found = true;
                         }
                     }
@@ -100,9 +117,8 @@ public class Factory
                         var  newFact = new Fact(current.Target + next.Target);
                         newFact.Operators.AddRange(current.Operators);
                         newFact.Operators.AddRange(next.Operators);
-                        if (!CheckContains(facts, newFact))
+                        if(Process(facts, newFact))
                         {
-                            facts.Add(newFact);
                             found = true;
                         }
                     }
@@ -112,6 +128,24 @@ public class Factory
         }
 
         return found;
+    }
+
+    private bool Process(List<Fact> facts, Fact newFact)
+    {
+        if (newFact.Operators.Count == 1)
+        {
+            newFact.Operators.First().Value = newFact.Target;
+        }
+
+        if (!CheckContains(facts, newFact))
+        {
+            facts.Add(newFact);
+            newFact.Operators = newFact.Operators.OrderBy(f => f.Id).ToList();
+            return true;
+        }
+
+        return false;
+
     }
 
     private bool CheckContains(List<Fact> facts, Fact fact)

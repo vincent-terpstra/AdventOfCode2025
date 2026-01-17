@@ -9,6 +9,20 @@ public class Status
     {
         Positions = positions;
     }
+
+    public Status Next(Switch modify, int depth)
+    {
+        List<int> newPositions = [..Positions];
+        foreach (var m in modify.Operators)
+        {
+            newPositions[m] -= depth;
+        }
+        
+        return new(newPositions)
+        {
+            Depth = this.Depth + depth,
+        };
+    }
     
     public IEnumerable<Status> Apply(Switch @switch)
     {
