@@ -2,10 +2,13 @@
 
 public class Switch
 {
+    public int? Value { get; set; }
+    public char Id {get; init;}
     public int Modify { get; }
     public List<int> Operators { get; } = new();
-    public Switch(string value)
+    public Switch(string value, char id)
     {
+        Id = id;
         var substr = value.Substring(1, value.Length - 2);
         foreach (var c in substr.Split(','))
         {
@@ -17,5 +20,5 @@ public class Switch
 
     public bool Contains(Switch other) => this != other && other.Operators.All(Operators.Contains);
     
-    public override string ToString() => $"Modify: {string.Join(',', Operators)}";
+    public override string ToString() => Value?.ToString() ?? Id.ToString();
 }

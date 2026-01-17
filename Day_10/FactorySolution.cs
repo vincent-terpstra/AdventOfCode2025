@@ -23,10 +23,13 @@ public class FactorySolution(ITestOutputHelper testOutputHelper)
     [Fact]
     public void Demo_Input_Should_2()
     {
-        var input = FileHelper.ReadFileAsList(10, "demo.txt");
+        var input = FileHelper.ReadFileAsList(10, "puzzle.txt");
         var factories = Factory.FromList(input);
-
-        var sum = factories.Sum(f => f.Solve2(testOutputHelper.WriteLine));
+        
+        var sum = factories
+            .Select(f => f.Solve2(testOutputHelper.WriteLine))
+            .Output(testOutputHelper)
+            .Sum();
         testOutputHelper.WriteLine(sum.ToString());
     }
 }

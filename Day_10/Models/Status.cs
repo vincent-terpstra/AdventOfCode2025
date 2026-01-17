@@ -7,31 +7,39 @@ public class Status
     
     public Status(List<int> positions)
     {
-        foreach (var position in positions) 
-            Positions.Add(position);
+        Positions = positions;
     }
-
-    public Status Apply(Switch @switch, int scale = 1)
+    
+    public IEnumerable<Status> Apply(Switch @switch)
     {
-        foreach (var mod in @switch.Operators)
+        yield return this;
+        var next = this.Next(@switch);
+        while (next.IsValid())
         {
-            int current = Positions[mod];
-            Positions[mod] = Math.Max(current - scale, 0);
+            yield return next;
+            next = next.Next(@switch);
         }
-        
-        Depth += scale;
-        return this;
     }
 
-    public List<int> Priorities()
+    public Status Next(Switch @switch)
     {
-        return Positions.Select((p, idx) => (p, idx))
-            .Where(p => p.p > 0)
-            .OrderByDescending(p => p.p)
-            .Select(p => p.idx)
-            .ToList();
+        List<int> positions = [..Positions];
+        foreach (var op in @switch.Operators)
+        {
+            positions[op]--;
+        }
+        return new(positions)
+        {
+            Depth = Depth + 1
+        };
     }
 
+    public bool IsValid()
+        => Positions.All(p => p >= 0);
+
+    public bool IsZero() 
+        => Positions.All(p => p == 0);
+    
     public int Distance()
     {
         return Positions.Sum();
